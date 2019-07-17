@@ -1,0 +1,54 @@
+snippet     title0
+abbr        title0
+options     head
+	${1:#:content_name}
+	########################################
+
+snippet     title1
+abbr        title1
+options     head
+	${1:#:content_name}
+	****************************************
+
+snippet     title2
+abbr        title2
+options     head
+	${1:#:content_name}
+	++++++++++++++++++++++++++++++++++++++++
+
+snippet     title3
+abbr        title3
+options     head
+	${1:#:content_name}
+	========================================
+
+snippet     title4
+abbr        title4
+options     head
+	${1:#:content_name}
+	::::::::::::::::::::::::::::::::::::::::
+
+snippet     title5
+abbr        title5
+options     head
+	${1:#:content_name}
+	----------------------------------------
+
+snippet     pelican
+abbr        pelican
+options     head
+	${1:#:content_name}
+	########################################
+	:date: `strftime("%Y/%m/%d %T")`
+	:slug: 
+	:category: 
+	:tags: 
+	:summary: 
+
+snippet     srcblock
+abbr        srcblock
+options     head
+	#+begin_src ${1:lang} :cache yes :file ${2:filename}
+	${0:script}
+	#+end_src
+

@@ -1,0 +1,82 @@
+#=============================================================================
+# dark_powered.toml --- dark powered configuration example for SpaceVim
+# Copyright (c) 2016-2017 Wang Shidong & Contributors
+# Author: Wang Shidong < wsdjeg at 163.com >
+# URL: https://spacevim.org
+# License: GPLv3
+#=============================================================================
+
+# All SpaceVim option below [option] section
+[options]
+    # set spacevim theme. by default colorscheme layer is not loaded,
+    # if you want to use more colorscheme, please load the colorscheme
+    # layer
+    colorscheme = "gruvbox"
+    background = "dark"
+    # Disable guicolors in basic mode, many terminal do not support 24bit
+    # true colors
+    enable_guicolors = true
+    # Disable statusline separator, if you want to use other value, please
+    # install nerd fonts
+    statusline_separator = "nil"
+    statusline_inactive_separator = "nil"
+    statusline_unicode_symbols = false
+    buffer_index_type = 4
+    enable_tabline_filetype_icon = true
+    enable_statusline_display_mode = false
+    default_indent = 4
+    expand_tab = false
+    vimcompatible = true
+    filemanager = "nerdtree"
+    guifont = "SauceCodePro Nerd Font Mono:h11"
+    bootstrap_after = "myspacevim#after"
+
+# Enable autocomplete layer
+[[layers]]
+name = 'autocomplete'
+auto-completion-return-key-behavior = "complete"
+auto-completion-tab-key-behavior = "smart"
+
+[[layers]]
+name = 'shell'
+default_position = 'top'
+default_height = 30
+
+[[layers]]
+name = "lang#plantuml"
+
+[[layers]]
+name = "lang#rust"
+
+[[layers]]
+name = "lang#python"
+format-on-save = 1
+
+[[layers]]
+name = "cscope"
+
+[[custom_plugins]]
+name = "vim-scripts/VisIncr"
+merged = 0
+
+# reStructuredText in Vim
+# Rykka === gu-fan
+[[custom_plugins]]
+name = "gu-fan/riv.vim"
+merged = 0
+
+[[custom_plugins]]
+name = "thuleqaid/previm"
+merged = 0
+
+[[custom_plugins]]
+name = "skywind3000/asyncrun.vim"
+merged = 0
+
+[[custom_plugins]]
+name = "vim-scripts/md5.vim"
+merged = 0
+
+[[custom_plugins]]
+name = "kshenoy/vim-signature"
+merged = 0
