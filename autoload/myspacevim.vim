@@ -2,6 +2,8 @@ let g:et#bin_plantuml = 'E:\home\.emacs.d\private\plantuml.jar'
 let g:et#openwith = {'png': 'E:\PortableSoft\iview\i_view64.exe'
                   \ ,'jpg': 'E:\PortableSoft\iview\i_view64.exe'
                   \ }
+let s:extlist_autofenc = ['c', 'h']
+
 silent! exe 'source ' . expand("<sfile>:p:h") . '/et.vim'
 
 func! HookPreload() abort
@@ -10,6 +12,16 @@ func! HookPreload() abort
     let l:filesize=getfsize(l:filename)
     if l:filesize>l:SizeLimit100k || l:filesize==-2
         call neocomplete#commands#_lock()
+    endif
+endf
+
+func! HookPost() abort
+    let l:filename = expand("<afile>")
+    if filereadable(l:filename)
+        let l:fileext = tolower(fnamemodify(l:filename, ":t:e"))
+        if index(s:extlist_autofenc, l:fileext) >= 0
+            silent! exe 'FencAutoDetect'
+        endif
     endif
 endf
 
@@ -37,6 +49,9 @@ func! myspacevim#after() abort
     let g:previm_enable_realtime = 0
     augroup HookPreload
     autocmd BufReadPre * call HookPreload()
+    augroup END
+    augroup HookPost
+    autocmd BufReadPost * call HookPost()
     augroup END
     " rust
     let g:racer_cmd = exepath('racer')

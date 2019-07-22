@@ -28,7 +28,7 @@
     expand_tab = false
     vimcompatible = true
     filemanager = "nerdtree"
-    guifont = "SauceCodePro Nerd Font Mono:h11"
+    guifont = "SauceCodePro Nerd Font Mono:h11,MS_Gothic:h11:cSHIFTJIS,SimSun-ExtB:h11:cGB2312:qDRAFT"
     bootstrap_after = "myspacevim#after"
 
 # Enable autocomplete layer
@@ -54,6 +54,9 @@ format-on-save = 1
 
 [[layers]]
 name = "cscope"
+
+[[layers]]
+name = "tools"
 
 [[custom_plugins]]
 name = "vim-scripts/VisIncr"
