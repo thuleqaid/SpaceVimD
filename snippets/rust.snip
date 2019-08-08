@@ -1,0 +1,150 @@
+snippet     startup
+abbr        startup
+options     head
+	// [dependencies]
+	// log = "0.4.0"
+	// log4rs = "0.8.0"
+	// serde = "1.0"
+	// serde_derive = "1.0"
+	// serde_yaml = "0.8"
+	// regex = "1"
+	// walkdir = "*"
+	// chardet = "0.2"
+	// encoding = "0.2"
+	#[macro_use] extern crate log;
+	extern crate log4rs;
+	#[macro_use] extern crate serde_derive;
+	extern crate serde_yaml;
+	extern crate walkdir;
+	extern crate regex;
+	extern crate chardet;
+	extern crate encoding;
+	
+	use std::fs;
+	use std::io::prelude::*;
+	use std::path::Path;
+	use chardet::{detect, charset2encoding};
+	use encoding::DecoderTrap;
+	use encoding::label::encoding_from_whatwg_label;
+	
+	fn main() {
+	    loginit("log.yaml");
+	    let config = Config::new("config.yaml");
+	    trace!("trace");
+	    debug!("debug");
+	    info!("info");
+	    warn!("warn");
+	    error!("error");
+	    let mut flist = Vec::<String>::new();
+	    walk(".", &mut flist);
+	    for item in flist {
+	        trace!(target:"test::a", "{}", item);
+	    }
+	    println!("{:?}", config);
+	    let txt = textreader("test.c");
+	    if txt.is_some() {
+	        for line in txt.unwrap().lines() {
+	            println!("{:?}", line);
+	        }
+	    }
+	}
+	
+	#[derive(Debug, PartialEq, Serialize, Deserialize)]
+	pub struct Config {
+	    a:f64,
+	    b:f64,
+	}
+	impl Config {
+	    pub fn new<P: AsRef<Path>>(path:P) -> Config{
+	        let file_exists = match fs::metadata(&path) {
+	            Ok(v) => v.is_file(),
+	            _ => false
+	        };
+	        if file_exists {
+	            serde_yaml::from_str(&fs::read_to_string(path).unwrap()).unwrap()
+	        } else {
+	            let default_config = Config { a:0.12, b:1.2};
+	            let s = serde_yaml::to_string(&default_config).unwrap();
+	            let mut fhandle = fs::File::create(path).unwrap();
+	            fhandle.write_all(s.as_bytes()).unwrap();
+	            default_config
+	        }
+	    }
+	}
+	
+	pub fn loginit<P: AsRef<Path>>(path:P) {
+	    let file_exists = match fs::metadata(&path) {
+	        Ok(v) => v.is_file(),
+	        _ => false
+	    };
+	    if !file_exists {
+	        let mut logconf = fs::File::create(&path).unwrap();
+	        let tmpl = "refresh_rate: 30 seconds
+	
+	appenders:
+	  console:
+	    kind: console
+	    encoder:
+	      pattern: \"{d(%H:%M:%S.%6f)} [{t}] {h({l})} {M}:{m}{n}\"
+	    filters:
+	    - kind: threshold
+	      level: error
+	  file:
+	    kind: file
+	    path: error.log
+	    encoder:
+	      pattern: \"{d(%Y-%m-%d %H:%M:%S.%6f%z)} [{t}] {l} {M}:{m}{n}\"
+	
+	root:
+	  level: warn
+	  appenders:
+	  - console
+	
+	loggers:
+	  test::a:
+	    level: info
+	    appenders:
+	    - file
+	    additive: true";
+	        logconf.write_all(tmpl.as_bytes()).unwrap();
+	    }
+	    log4rs::init_file(path, Default::default()).unwrap();
+	}
+	
+	pub fn walk<P: AsRef<Path>>(path: P, flist: &mut Vec<String>) {
+	    let pat = regex::Regex::new(r"\.(?i:d)$").unwrap();
+	    for entry in walkdir::WalkDir::new(path) {
+	        if let Ok(entry) = entry {
+	            if entry.file_type().is_dir() {
+	                continue;
+	            }
+	            let name = entry.file_name();
+	            if let Some(s) = name.to_str() {
+	                if pat.is_match(s) {
+	                    flist.push(entry.path().to_str().unwrap().to_string());
+	                }
+	            }
+	        }
+	    }
+	}
+	
+	pub fn textreader<P: AsRef<Path>>(path: P) -> Option<String> {
+	    // open text file
+	    let mut fh = fs::OpenOptions::new().read(true).open(path).expect(
+	        "Could not open file",
+	    );
+	    let mut reader: Vec<u8> = Vec::new();
+	    // read file
+	    fh.read_to_end(&mut reader).expect("Could not read file");
+	    // detect charset of the file
+	    // result.0 Encode
+	    // result.1 Confidence
+	    // result.2 Language
+	    let result = detect(&reader);
+	    // decode file into utf-8
+	    let coder = encoding_from_whatwg_label(charset2encoding(&result.0));
+	    match coder {
+	        Some(x) => Some(x.decode(&reader, DecoderTrap::Ignore).expect("Error")),
+	        None => None
+	    }
+	}

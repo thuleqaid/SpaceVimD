@@ -58,6 +58,9 @@ name = "cscope"
 [[layers]]
 name = "tools"
 
+[[layers]]
+name = "chinese"
+
 [[custom_plugins]]
 name = "vim-scripts/VisIncr"
 merged = 0
