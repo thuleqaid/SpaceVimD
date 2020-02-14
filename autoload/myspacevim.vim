@@ -41,7 +41,7 @@ func! myspacevim#after() abort
     cnoremap <C-p> <Up>
     " expandtab for specified filetypes
     if has("autocmd")
-        autocmd FileType python,html,rust set expandtab
+        autocmd FileType python,html,rust,javascript set expandtab
     endif
     " system clipboard
     map <F5> "+y

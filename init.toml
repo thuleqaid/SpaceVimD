@@ -53,7 +53,10 @@ name = "lang#python"
 format-on-save = 1
 
 [[layers]]
-name = "cscope"
+name = "lang#vue"
+
+# [[layers]]
+# name = "cscope"
 
 [[layers]]
 name = "tools"
