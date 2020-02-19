@@ -15,6 +15,7 @@ vim使用指南
 + PlantUML_\ (需要Java运行环境)
 + git_
 + IrfanView_
++ Graphviz_
 
 vim_\ 安装
 ++++++++++++++++++++++++++++++++++++++++
@@ -68,6 +69,9 @@ SpaceVim_\ 配置下载
 
     + g:et#bin_plantuml：plantuml.jar的路径
     + g:et#openwith：用外部软件打开光标所在位置的文件
+    + g:et#bin_dot：Graphviz_\ 中dot.exe的路径（若在系统path路径中可以不用设置）
+
+  - 自制插件导入（ip.vim）
 
   - HookPreload()：对于超过100kB的文件，禁用autocomplete，可以用\ ``Ctrl+n``\ 手动激活
   - 快捷键设置
@@ -76,6 +80,7 @@ SpaceVim_\ 配置下载
     + F6：粘贴（系统剪贴板）
     + F7：执行\ ``#+begin_src``\ 与\ ``#+end_src``\ 之间的代码
     + F8：用外部软件打开光标所在位置的文件
+    + F9：将当前文件移动到其它Vim实例中
     + SPC j p：展开snippet后，跳转到下一个placehoder
 
 + snippets
@@ -95,3 +100,4 @@ SpaceVim_\ 配置下载
 .. _Anaconda: https://mirrors.tuna.tsinghua.edu.cn/help/anaconda/
 .. _PlantUML: http://plantuml.com/zh/
 .. _IrfanView: https://www.irfanview.com
+.. _Graphviz: http://www.graphviz.org
