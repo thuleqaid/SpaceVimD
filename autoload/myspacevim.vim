@@ -6,6 +6,7 @@ let s:extlist_autofenc = ['c', 'h']
 let s:extlist_disablecomplete = ['rs']
 
 silent! exe 'source ' . expand("<sfile>:p:h") . '/et.vim'
+silent! exe 'source ' . expand("<sfile>:p:h") . '/ip.vim'
 
 func! HookPreload() abort
     let l:SizeLimit100k = 1024 * 100
