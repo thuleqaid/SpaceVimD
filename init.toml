@@ -79,6 +79,10 @@ name = "thuleqaid/previm"
 merged = 0
 
 [[custom_plugins]]
+name = "skywind3000/asynctasks.vim"
+merged = 0
+
+[[custom_plugins]]
 name = "skywind3000/asyncrun.vim"
 merged = 0
 

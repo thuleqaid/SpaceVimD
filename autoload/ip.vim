@@ -24,10 +24,10 @@ func! ip#moveToOtherProcess() abort
 			let l:servercnt = len(l:servers)
 			if l:servercnt > 0
 				let l:target = ""
-				if len(l:servers) == 1
+				if l:servercnt == 1
 					let l:target = l:servers[0]
-				elseif len(l:servers) > 1
-					let l:choice = s:ListAndSelect("Select Vim Instance:", l:servers, 0)
+				elseif l:servercnt > 1
+					let l:choice = ListAndSelect("Select Vim Instance:", l:servers, 0)
 					if l:choice >= 0
 						let l:target = l:servers[l:choice]
 					else
@@ -47,23 +47,5 @@ func! ip#moveToOtherProcess() abort
 		echo "No file in the window!"
 	endif
 endf
-
-function! s:ListAndSelect(title, itemlist, markindex)
-	let l:choices = copy(a:itemlist)
-	" generate choice-list
-	call map(l:choices, '"  " . (v:key + 1) . ". " . v:val')
-	" insert '*' at the start of selected item
-	if (a:markindex >= 0) && (a:markindex < len(a:itemlist))
-		let l:choices[a:markindex] = '*' . l:choices[a:markindex][1:]
-	endif
-	" set list title
-	call insert(l:choices, a:title)
-	" ask for user choice
-	let l:choice = inputlist(l:choices)
-	if (l:choice < 1) || (l:choice > len(a:itemlist))
-		let l:choice = 0
-	endif
-	return l:choice - 1
-endfunction
 
 nmap <F9> :call ip#moveToOtherProcess()<CR>
