@@ -30,6 +30,7 @@
     filemanager = "nerdtree"
     guifont = "SauceCodePro Nerd Font Mono:h11,MS_Gothic:h11:cSHIFTJIS,SimSun-ExtB:h11:cGB2312:qDRAFT"
     bootstrap_after = "myspacevim#after"
+    disabled_plugins = ['markdown-preview.nvim', 'vim-node-rpc']
 
 # Enable autocomplete layer
 [[layers]]
@@ -54,6 +55,9 @@ format-on-save = 1
 
 [[layers]]
 name = "lang#vue"
+
+[[layers]]
+name = "lang#markdown"
 
 # [[layers]]
 # name = "cscope"
