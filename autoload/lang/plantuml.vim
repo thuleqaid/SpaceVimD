@@ -3,8 +3,8 @@ let g:et#bin_plantuml = get(g:, 'et#bin_plantuml', '')
 
 func! s:plantuml_setup(info) abort
 	let l:scripts = copy(a:info['#scripts'])
-	call insert(l:scripts, "@startuml", 0)
-	call add(l:scripts, "@enduml")
+	"call insert(l:scripts, "@startuml", 0)
+	"call add(l:scripts, "@enduml")
 	silent! exe 'e ' . a:info['#tmpname']
 	call append(line('$'), l:scripts)
 	silent! exe 'normal dd'

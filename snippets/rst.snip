@@ -45,10 +45,53 @@ options     head
 	:tags: 
 	:summary: 
 
-snippet     srcblock
-abbr        srcblock
+snippet     dotblock
+abbr        dotblock
 options     head
-	#+begin_src ${1:lang} :cache yes :file ${2:filename}
-	${0:script}
-	#+end_src
+	.. image:: ${1:#:filename}
+	
+	..
+	  #+begin_src dot :cache yes :file $1
+	  digraph G {
+	  	node [fontname="Microsoft YaHei"];
+	  	edge [fontname="MS PGothic"];
+	  	${0}
+	  }
+	  #+end_src
 
+snippet     txtblock
+abbr        txtblock
+options     head
+	..
+	  #+begin_src txt :cache yes :file ${1:filename}
+	  ${0}
+	  #+end_src
+
+snippet     plantumlblock
+abbr        plantumlblock
+options     head
+	.. image:: ${1:#:filename}
+	
+	..
+	  #+begin_src plantuml :cache yes :file $1 :cmdline -charset UTF-8
+	  @startuml
+	  ${0}
+	  @enduml
+	  #+end_src
+
+snippet     pyblock
+abbr        pyblock
+options     head
+	.. image:: ${1:#:filename}
+	
+	..
+	  #+begin_src python :cache yes
+	  import matplotlib.pyplot as plt
+	  fs = (4, 3)
+	  dpi_set = 100
+	  plt.figure(figsize=fs, dpi=dpi_set)
+	  plt.axis([0, dpi_set * fs[0] - 1, 0, dpi_set * fs[1] - 1])
+	  plt.subplots_adjust(left=0, top=1, right=1, bottom=0, wspace=0, hspace=0)
+	  ${0}
+	  plt.savefig('$1')
+	  #+end_src

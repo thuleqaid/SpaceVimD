@@ -124,7 +124,7 @@ func! myspacevim#after() abort
     " rust
     let g:racer_cmd = exepath('racer')
     " define 'SPC j p' to jump to next placeholder of neosnippet
-    call SpaceVim#mapping#space#def('nnoremap', ['j', 'p'], 'call neosnippet#view#_search_outof_range(1)', 'Jump to next placeholder of neosnippet', 1)
+    call SpaceVim#mapping#space#def('nnoremap', ['j', 'p'], 'call neosnippet#view#_jump(1, 1)', 'Jump to next placeholder of neosnippet', 1)
     " append .py to $PATHEXT
     if has('win32')
         if getenv('PATHEXT') == v:null
