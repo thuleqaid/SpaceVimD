@@ -122,6 +122,8 @@ SpaceVim_\ 配置下载
     + F5：复制（系统剪贴板）
     + F6：粘贴（系统剪贴板）
     + F7：执行\ ``#+begin_src``\ 与\ ``#+end_src``\ 之间的代码
+    + Shift-F7：强制执行\ ``#+begin_src``\ 与\ ``#+end_src``\ 之间的代码
+    + Ctrl-F7：强制执行整个文件中\ ``#+begin_src``\ 与\ ``#+end_src``\ 之间的代码
     + F8：用外部软件打开光标所在位置的文件
     + F9：将当前文件移动到其它Vim实例中
     + SPC j p：展开snippet后，跳转到下一个placehoder

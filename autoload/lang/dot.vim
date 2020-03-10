@@ -30,7 +30,6 @@ func! s:dot_run(info) abort
 	let l:result = system(l:cmd)
 	silent! exe 'cd -'
 	return l:result
-
 endf
 
 func! s:dot_teardown(info) abort
