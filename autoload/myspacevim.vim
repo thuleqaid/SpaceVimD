@@ -1,4 +1,4 @@
-let g:et#bin_plantuml = 'E:\home\.emacs.d\private\plantuml.jar'
+let g:et#bin_plantuml = 'E:\home\.SpaceVim.d\plantuml.jar'
 let g:et#openwith = {'png': 'E:\PortableSoft\iview\i_view64.exe'
                   \ ,'jpg': 'E:\PortableSoft\iview\i_view64.exe'
                   \ }
