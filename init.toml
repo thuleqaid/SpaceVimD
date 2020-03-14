@@ -30,7 +30,7 @@
     filemanager = "nerdtree"
     guifont = "SauceCodePro Nerd Font Mono:h11,MS_Gothic:h11:cSHIFTJIS,SimSun-ExtB:h11:cGB2312:qDRAFT"
     bootstrap_after = "myspacevim#after"
-    disabled_plugins = ['markdown-preview.nvim', 'vim-node-rpc']
+    disabled_plugins = ['tagbar-markdown', 'mathjax-support-for-mkdp', 'markdown-preview.nvim', 'vim-node-rpc']
 
 # Enable autocomplete layer
 [[layers]]
@@ -83,15 +83,15 @@ name = "thuleqaid/previm"
 merged = 0
 
 [[custom_plugins]]
+name = "thuleqaid/tagbar_md"
+merged = 0
+
+[[custom_plugins]]
 name = "skywind3000/asynctasks.vim"
 merged = 0
 
 [[custom_plugins]]
 name = "skywind3000/asyncrun.vim"
-merged = 0
-
-[[custom_plugins]]
-name = "vim-scripts/md5.vim"
 merged = 0
 
 [[custom_plugins]]

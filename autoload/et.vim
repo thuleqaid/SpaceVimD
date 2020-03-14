@@ -1,11 +1,9 @@
 " dependencies:
 "   skywind3000/asyncrun.vim
-"   vim-scripts/md5.vim
 
 let g:et#openwith = get(g:, 'et#openwith', {})
 let g:et#languages = get(g:, 'et#languages', {})
-let g:et#dep = {'md5': exists('*md5#md5')
-             \ ,'asyncrun': exists(':AsyncRun')
+let g:et#dep = {'asyncrun': exists(':AsyncRun')
              \ }
 
 func! et#OpenWith() abort
@@ -44,11 +42,7 @@ func! et#Execute(whole, force) abort
 				call add(l:scripts, strpart(l:lines[l:i], l:pos[2]))
 				let l:i = l:i + 1
 			endwhile
-			if g:et#dep['md5']
-				let l:md5 = md5#md5(join(l:scripts, "\n"))
-			else
-				let l:md5 = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-			endif
+			let l:md5 = sha256(join(l:scripts, "\n"))
 			" parse params
 			let l:startline = strpart(l:lines[0], l:pos[2])
 			let l:params = split(l:startline, ' \+')
@@ -90,16 +84,11 @@ func! et#Execute(whole, force) abort
 					endwhile
 					if l:linecheck =~ l:checkpat2
 						let l:aa = matchstrpos(l:linecheck, '\[[0-9a-z]\+\]')
-						if g:et#dep['md5']
-							if strpart(l:aa[0], 1, len(l:aa[0]) - 2) == l:info['#md5']
-								if a:force > 0
-									let l:info['#cache'] = l:i
-								else
-									let l:run = 0
-									echo 'No changes after last execution.'
-								endif
-							else
+						if strpart(l:aa[0], 1, len(l:aa[0]) - 2) == l:info['#md5']
+							if a:force > 0
 								let l:info['#cache'] = l:i
+							else
+								let l:run = -1
 							endif
 						else
 							let l:info['#cache'] = l:i
@@ -131,9 +120,13 @@ func! et#Execute(whole, force) abort
 			endif
 		endwhile
 		redraw
-		echo 'Finished ' . l:poslen
+		if l:run < 0
+			echo 'No changes after last execution. Use "Shift-F7" to run by force.'
+		else
+			echo 'Finished ' . l:poslen
+		endif
 	else
-		echo 'No src block found'
+		echo 'No src block found. Use "Ctrl-F7" to run all src blocks in the file by force.'
 	endif
 endf
 
@@ -172,9 +165,9 @@ func! s:srcblock(whole) abort
 		endwhile
 	else
 		silent! exe "normal $"
-		let l:row1 = search('\c#+begin_src\>', 'b')
+		let l:row1 = search('\c#+begin_src\>', 'bW')
 		let l:col1 = col('.')
-		let l:row2 = search('\c#+end_src\>')
+		let l:row2 = search('\c#+end_src\>', 'W')
 		let l:col2 = col('.')
 		if (l:row1 > 0) && (l:row2 > 0) && (l:currow <= l:row2) && (l:col1 == l:col2)
 			call add(l:pos, [l:row1, l:col1, l:row2, l:col2])

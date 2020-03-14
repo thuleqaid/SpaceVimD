@@ -1,7 +1,7 @@
 snippet     dotblock
 abbr        dotblock
 options     head
-	![${2:`strftime('%F %T').'#'.sha256(expand('%:p')`}](${1:#:filename})
+	![${2:`sha256(strftime('%F %T').'#'.expand('%:p'))`}](${1:#:filename})
 	
 	<!--
 	  #+begin_src dot :cache yes :file $1 :hash $2
@@ -25,7 +25,7 @@ options     head
 snippet     plantumlblock
 abbr        plantumlblock
 options     head
-	![${2:`strftime('%F %T').'#'.sha256(expand('%:p')`}](${1:#:filename})
+	![${2:`sha256(strftime('%F %T').'#'.expand('%:p'))`}](${1:#:filename})
 	
 	<!--
 	  #+begin_src plantuml :cache yes :file $1 :cmdline -charset UTF-8 :hash $2
@@ -38,7 +38,7 @@ options     head
 snippet     pyblock
 abbr        pyblock
 options     head
-	![${2:`strftime('%F %T').'#'.sha256(expand('%:p')`}](${1:#:filename})
+	![${2:`sha256(strftime('%F %T').'#'.expand('%:p'))`}](${1:#:filename})
 	
 	<!--
 	  #+begin_src python :cache yes :file $1 :hash $2
