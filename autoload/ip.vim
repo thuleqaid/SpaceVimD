@@ -27,8 +27,9 @@ func! ip#moveToOtherProcess() abort
 				if l:servercnt == 1
 					let l:target = l:servers[0]
 				elseif l:servercnt > 1
-					let l:choice = ListAndSelect("Select Vim Instance:", l:servers, 0)
-					if l:choice >= 0
+					call insert(l:servers, "Select Vim instance:")
+					let l:choice = SelectList(l:servers, -1)
+					if l:choice > 0
 						let l:target = l:servers[l:choice]
 					else
 						echo "Abort"
@@ -47,5 +48,3 @@ func! ip#moveToOtherProcess() abort
 		echo "No file in the window!"
 	endif
 endf
-
-nmap <F9> :call ip#moveToOtherProcess()<CR>

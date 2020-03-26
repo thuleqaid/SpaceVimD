@@ -197,8 +197,3 @@ silent! exe 'source ' . expand("<sfile>:p:h") . '/lang/text.vim'
 silent! exe 'source ' . expand("<sfile>:p:h") . '/lang/plantuml.vim'
 silent! exe 'source ' . expand("<sfile>:p:h") . '/lang/python.vim'
 silent! exe 'source ' . expand("<sfile>:p:h") . '/lang/dot.vim'
-
-nmap <F7> :call et#Execute(0, 0)<CR>
-nmap <S-F7> :call et#Execute(0, 1)<CR>
-nmap <C-F7> :call et#Execute(1, 1)<CR>
-nmap <F8> :call et#OpenWith()<CR>

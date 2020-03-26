@@ -44,6 +44,9 @@ default_position = 'top'
 default_height = 30
 
 [[layers]]
+name = 'leaderf'
+
+[[layers]]
 name = "lang#plantuml"
 
 [[layers]]

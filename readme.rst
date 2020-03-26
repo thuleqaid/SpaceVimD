@@ -119,6 +119,9 @@ SpaceVim_\ 配置下载
   - HookPreload()：对于超过100kB的文件，禁用autocomplete，可以用\ ``Ctrl+n``\ 手动激活
   - 快捷键设置
 
+    + F2：Tagbar（SpaceVim默认设置）
+    + F3：NERDTree（SpaceVim默认设置）
+    + F4：MundoTree
     + F5：复制（系统剪贴板）
     + F6：粘贴（系统剪贴板）
     + F7：执行\ ``#+begin_src``\ 与\ ``#+end_src``\ 之间的代码

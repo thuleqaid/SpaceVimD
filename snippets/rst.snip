@@ -92,6 +92,11 @@ options     head
 	  plt.figure(figsize=fs, dpi=dpi_set)
 	  plt.axis([0, dpi_set * fs[0] - 1, 0, dpi_set * fs[1] - 1])
 	  plt.subplots_adjust(left=0, top=1, right=1, bottom=0, wspace=0, hspace=0)
+	  ax = plt.gca()
+	  ax.spines['top'].set_visible(False)
+	  ax.spines['right'].set_visible(False)
+	  ax.spines['bottom'].set_visible(False)
+	  ax.spines['left'].set_visible(False)
 	  ${0}
 	  plt.savefig('$1')
 	  #+end_src
