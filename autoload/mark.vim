@@ -6,15 +6,21 @@ highlight def MarkWord5  ctermbg=Magenta  ctermfg=Black  guibg=#FFB3FF    guifg=
 highlight def MarkWord6  ctermbg=Blue     ctermfg=Black  guibg=#9999FF    guifg=Black
 
 let g:mark#groups = get(g:, 'mark#groups', ["MarkWord1", "MarkWord2", "MarkWord3", "MarkWord4", "MarkWord5", "MarkWord6"])
-let b:data = [{'pattern': '', 'id': -1}, {'pattern': '', 'id': -1}, {'pattern': '', 'id': -1}, {'pattern': '', 'id': -1}, {'pattern': '', 'id': -1}, {'pattern': '', 'id': -1}]
+let b:initialized = 0
+let b:data = []
 
 func! s:EscapeText(text)
     return substitute(escape(a:text, '\' . '^$.*[~'), "\n", '\\n', 'ge')
 endf
+func! s:checkInit() abort
+    if b:initialized <= 0
+        for l:item in g:mark#groups
+            let b:data += [{'pattern': '', 'id': -1, 'group':l:item}]
+        endfor
+        let b:initialized = 1
+    endif
+endf
 func! s:nextIndex()
-    "if len(b:data) <= 0
-    "    call add(b:data, {'pattern': '', 'id': -1})
-    "endif
     let l:i = 0
     while l:i < len(b:data)
         if b:data[l:i]['id'] < 0
@@ -33,15 +39,15 @@ func! s:selectHighlight() abort
     let l:i = 0
     while l:i < len(b:data)
         if b:data[l:i]['id'] >= 0
-            let l:rows += [[g:mark#groups[l:i], b:data[l:i]['pattern']]]
-            let l:highmap += [[g:mark#groups[l:i], 'Comment']]
+            let l:rows += [[b:data[l:i]['group'], b:data[l:i]['pattern']]]
+            let l:highmap += [[b:data[l:i]['group'], 'Comment']]
         endif
         let l:i = l:i + 1
     endwhile
     let l:choice = SelectTable(l:rows, l:highmap, -1)
     let l:i = 0
     while l:i < len(b:data)
-        if (b:data[l:i]['id'] >= 0) && (l:rows[l:choice][0] == g:mark#groups[l:i]) && (l:rows[l:choice][1] == b:data[l:i]['pattern'])
+        if (b:data[l:i]['id'] >= 0) && (l:rows[l:choice][0] == b:data[l:i]['group']) && (l:rows[l:choice][1] == b:data[l:i]['pattern'])
             return l:i
         endif
         let l:i = l:i + 1
@@ -49,6 +55,7 @@ func! s:selectHighlight() abort
     return -1
 endf
 func! mark#MarkCurruntWord() abort
+    call s:checkInit()
     let l:pos = s:nextIndex()
     if l:pos >= 0
         let l:cword = expand('<cword>')
@@ -59,24 +66,26 @@ func! mark#MarkCurruntWord() abort
             if l:cword =~# '^\k\+$'
                 let l:regexp = '\<' . l:regexp . '\>'
             endif
-            let l:mid = matchadd(g:mark#groups[l:pos], l:regexp)
+            let l:mid = matchadd(b:data[l:pos]['group'], l:regexp)
             let b:data[l:pos]['pattern'] = l:regexp
             let b:data[l:pos]['id'] = l:mid
         endif
     endif
 endf
 func! mark#MarkExpression() abort
+    call s:checkInit()
     let l:pos = s:nextIndex()
     if l:pos >= 0
         let l:regexp = input("Expression: ")
         if !empty(l:regexp)
-            let l:mid = matchadd(g:mark#groups[l:pos], l:regexp)
+            let l:mid = matchadd(b:data[l:pos]['group'], l:regexp)
             let b:data[l:pos]['pattern'] = l:regexp
             let b:data[l:pos]['id'] = l:mid
         endif
     endif
 endf
 func! mark#DeleteHighlight() abort
+    call s:checkInit()
     let l:pos = s:selectHighlight()
     if l:pos >= 0
         call matchdelete(b:data[l:pos]['id'])
@@ -84,6 +93,7 @@ func! mark#DeleteHighlight() abort
     endif
 endf
 func! mark#SearchHighlight() abort
+    call s:checkInit()
     let l:pos = s:selectHighlight()
     if l:pos >= 0
         call setreg('/', b:data[l:pos]['pattern'])
