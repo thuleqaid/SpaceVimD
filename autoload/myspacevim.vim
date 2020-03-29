@@ -4,12 +4,14 @@ let g:et#openwith = {'png': 'E:\PortableSoft\iview\i_view64.exe'
                   \ }
 let s:extlist_autofenc = ['c', 'h']
 let s:extlist_disablecomplete = ['rs']
+let s:extlist_expandtab = ['python', 'html', 'rust', 'javascript', 'markdown', 'vim', 'c', 'cpp']
 
+silent! exe 'source ' . expand("<sfile>:p:h") . '/common.vim'
 silent! exe 'source ' . expand("<sfile>:p:h") . '/et.vim'
 silent! exe 'source ' . expand("<sfile>:p:h") . '/ip.vim'
 silent! exe 'source ' . expand("<sfile>:p:h") . '/mark.vim'
 
-func! HookPreload() abort
+func! s:HookPreload() abort
     let l:SizeLimit100k = 1024 * 100
     let l:filename = expand("<afile>")
     let l:filesize=getfsize(l:filename)
@@ -21,127 +23,27 @@ func! HookPreload() abort
         call neocomplete#commands#_lock()
     endif
 endf
-
-func! HookPost() abort
+func! s:HookPost() abort
     let l:filename = expand("<afile>")
     if filereadable(l:filename)
         let l:fileext = tolower(fnamemodify(l:filename, ":t:e"))
         if index(s:extlist_autofenc, l:fileext) >= 0
             silent! exe 'FencAutoDetect'
         endif
-    endif
-endf
-
-func! SelectList(itemlist, markindex) abort
-    call s:print_list(a:itemlist, a:markindex)
-    let l:choice = s:get_choice()
-    if l:choice >= len(a:itemlist)
-        return 0
-    else
-        return l:choice
-    endif
-endf
-func! SelectTable(table, highmap, markindex) abort
-    call s:print_table(a:table, a:highmap, a:markindex)
-    let l:choice = s:get_choice()
-    if l:choice >= len(a:table)
-        return 0
-    else
-        return l:choice
-    endif
-endf
-func! s:get_choice() abort
-	let l:choice = inputlist([])
-	if l:choice < 1
-		let l:choice = 0
-	endif
-	echo "\n"
-	return l:choice
-endf
-func! s:print_list(itemlist, markindex) abort
-    let l:rows = []
-    let l:highmap = []
-    for l:item in a:itemlist
-        let l:rows += [[l:item]]
-        let l:highmap += [['']]
-    endfor
-    call s:print_table(l:rows, l:highmap, a:markindex)
-endf
-func! s:print_table(rows, highmap, markindex) abort
-    let l:rows = deepcopy(a:rows)
-    let l:highmap = deepcopy(a:rows)
-    " prepend number
-    let l:i = len(l:rows) - 1
-    while l:i > 0
-        call insert(l:rows[l:i], '' . l:i)
-        let l:i = l:i - 1
-    endwhile
-    call insert(l:rows[0], 'No.')
-    let l:i = len(l:highmap) - 1
-    while l:i > 0
-        call insert(l:highmap[l:i], 'Number')
-        let l:i = l:i - 1
-    endwhile
-    call insert(l:highmap[0], 'Title')
-    let l:nrows = len(l:rows)
-    let l:ncols = 0
-    for l:row in l:rows
-        if len(l:row) > l:ncols
-            let l:ncols = len(l:row)
+        if index(s:extlist_expandtab, &filetype) >= 0
+            call s:autoExpandTab()
         endif
-    endfor
-    if l:nrows > 0 && l:ncols > 0
-        " tabulify
-        let l:content = []
-        let l:xrows = []
-        let l:sizes = repeat([0], l:ncols)
-        let l:index = range(l:ncols)
-        for l:row in l:rows
-            let l:newrow = deepcopy(l:row)
-            if len(l:newrow) < l:ncols
-                let l:newrow += repeat([''], l:ncols - len(l:newrow))
-            endif
-            for l:i in l:index
-                let l:size = strwidth(l:newrow[i])
-                let l:sizes[l:i] = (l:sizes[l:i] < l:size)? l:size : l:sizes[i]
-            endfor
-            let l:xrows += [l:newrow]
-        endfor
-        for l:row in l:xrows
-            let l:ni = []
-            for l:i in l:index
-                let l:x = l:row[l:i]
-                let l:size = strwidth(l:x)
-                if l:size < l:sizes[l:i]
-                    let l:x = l:x . repeat(' ', l:sizes[i] - l:size)
-                endif
-                let l:ni += [l:x]
-            endfor
-            let l:content += [l:ni]
-        endfor
-        " print
-        let l:index = 0
-        for l:line in l:content
-            let l:col = 0
-            if l:index == 0
-                echon " "
-            else
-                if l:index == a:markindex
-                    echon "\n*"
-                else
-                    echon "\n "
-                endif
-            endif
-            for l:cell in l:line
-                exec 'echohl ' . ((l:highmap[l:index][l:col]=='')? "None" : l:highmap[l:index][l:col])
-                echon cell . '  '
-                let col += 1
-            endfor
-            let index += 1
-        endfor
-        echohl None
     endif
-endfunc
+endf
+func! s:autoExpandTab()
+    let l:leadingTab = search("^\t","n")
+    let l:leadingSpace = search("^ \\{2,\\}","n")
+    if (l:leadingTab > 0) && (l:leadingSpace <= 0)
+        silent! exe "setlocal noexpandtab"
+    else
+        silent! exe "setlocal expandtab"
+    endif
+endf
 
 func! s:AsyncTaskAuto() abort
     let l:tasks = asynctasks#list('')
@@ -199,10 +101,6 @@ func! myspacevim#after() abort
     cnoremap <C-f> <Right>
     cnoremap <C-n> <Down>
     cnoremap <C-p> <Up>
-    " expandtab for specified filetypes
-    if has("autocmd")
-        autocmd FileType python,html,rust,javascript,markdown,vim set expandtab
-    endif
     " space marks
     set list
     set listchars=tab:>-,trail:-
@@ -211,10 +109,10 @@ func! myspacevim#after() abort
     " reStructuredText realtime preview
     let g:previm_enable_realtime = 0
     augroup HookPreload
-    autocmd BufReadPre * call HookPreload()
+    autocmd BufReadPre * call s:HookPreload()
     augroup END
     augroup HookPost
-    autocmd BufReadPost * call HookPost()
+    autocmd BufReadPost * call s:HookPost()
     augroup END
     " rust
     let g:racer_cmd = exepath('racer')
@@ -228,9 +126,21 @@ func! myspacevim#after() abort
             call setenv('PATHEXT', getenv('PATHEXT') . ';.PY') 
         endif
     endif
-    command! -bang -nargs=0 AsyncAuto call s:AsyncTaskAuto()
     " project root pattern
     call add(g:spacevim_project_rooter_patterns, '.root')
+    " LeaderF
+    let g:_spacevim_mappings.F = ['call feedkeys(":Leaderf ", "n")', 'Leaderf shortcut']
+    let g:Lf_GtagsAutoGenerate = 0
+    let g:Lf_Gtagslabel = 'native-pygments'
+    let g:Lf_RootMarkers = ['.git', '.hg', '.svn', '.root']
+    let g:_spacevim_mappings.f.g = {'name' : '+gtags'}
+    noremap <leader>fgr :<C-U><C-R>=printf("Leaderf! gtags -r %s --auto-jump", expand("<cword>"))<CR><CR>
+    noremap <leader>fgd :<C-U><C-R>=printf("Leaderf! gtags -d %s --auto-jump", expand("<cword>"))<CR><CR>
+    noremap <leader>fgg :<C-U><C-R>=printf("Leaderf! gtags -g %s --auto-jump", expand("<cword>"))<CR><CR>
+    let g:_spacevim_mappings.f.g.b = ['Leaderf gtags', 'browser']
+    let g:_spacevim_mappings.f.g.n = ['Leaderf gtags --next', 'next']
+    let g:_spacevim_mappings.f.g.p = ['Leaderf gtags --previous', 'previous']
+    let g:_spacevim_mappings.f.g.u = ['Leaderf gtags --update', 'update']
     " vim-bookmarks
     let g:bookmark_save_per_working_dir = 1
     let g:bookmark_auto_save = 1
@@ -276,4 +186,7 @@ func! myspacevim#after() abort
     nmap <C-F7> :call et#Execute(1, 1)<CR>
     nmap <F8> :call et#OpenWith()<CR>
     nmap <F9> :call ip#moveToOtherProcess()<CR>
+
+    command! -bang -nargs=0 AsyncAuto call s:AsyncTaskAuto()
+    command! -n=0 -rang=% -bar LvlDraw :<line1>,<line2>call LvlDraw()
 endf
