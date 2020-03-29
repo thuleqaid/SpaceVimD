@@ -87,6 +87,11 @@ func! s:AsyncTaskAuto() abort
     endif
 endf
 
+func! s:enableModifyTag() abort
+    silent! exe 'source ' . expand("<sfile>:p:h") . '/modifytag.vim'
+    call ModifyTag#mapping()
+endf
+
 function! g:BMWorkDirFileLocation()
     let filename = '/.bookmarks'
     return SpaceVim#plugins#projectmanager#current_root() . filename
@@ -188,5 +193,6 @@ func! myspacevim#after() abort
     nmap <F9> :call ip#moveToOtherProcess()<CR>
 
     command! -bang -nargs=0 AsyncAuto call s:AsyncTaskAuto()
+    command! -n=0 -bar EnableModifyTag :call s:enableModifyTag()
     command! -n=0 -rang=% -bar LvlDraw :<line1>,<line2>call LvlDraw()
 endf
