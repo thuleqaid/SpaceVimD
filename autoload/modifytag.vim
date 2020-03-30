@@ -10,7 +10,7 @@
 " CodeReview Command :
 " 1a. use `ModifyTagOKChanges` to approve selected lines
 " 1b. use `ModifyTagOKWithoutTag` to approve selected lines(the whole modify section must be selected)
-" 2. use `ModifyTagNGChanges` to approve selected lines
+" 2. use `ModifyTagNGChanges` to deny selected lines
 " Static Check command
 " 1. use `ModifyTagTerminalCmd` to list all changes in the current directory
 " 2.a use `ModifyTagStaticCheck 0 1/0` to list loop/divide statements in the modified files
@@ -19,14 +19,14 @@
 " Diff Modified Files
 " 1. use `ModifyTagTerminalCmd` to list all changes in the current directory
 " 2. use `ModifyTagSumFiles` to summarize modified files
-" 3. use `ModifyTagDiffFiles` to generate vim script for diff files
-" 4. set base soft dir in the empty line between g:mt_tag_diff_tag1 and g:mt_tag_diff_tag2
+" 3. set base soft dir in the empty line between g:mt_tag_diff_tag1 and g:mt_tag_diff_tag2
 "    set output html dir in the empty line between g:mt_tag_diff_tag3 and g:mt_tag_diff_tag4
 "      Default Value for g:mt_tag_diff_tag1 ~ g:mt_tag_diff_tag4
 "        g:mt_tag_diff_tag1 = "#1 Base Source Dir:"
 "        g:mt_tag_diff_tag2 = "#2 New Source Dir:"
 "        g:mt_tag_diff_tag3 = "#3 Output Html Dir:"
 "        g:mt_tag_diff_tag4 = "#4 FileList:"
+" 4. use `ModifyTagDiffFiles` to generate vim script for diff files
 " 5. use :so % to run the generated vim script
 "" key-binding
 "nmap <Leader>ta :ModifyTagAddSource<CR>
@@ -129,8 +129,8 @@ func! s:loadConfig() abort
     else
         " create an example config file
         call writefile(s:template, l:local_conf)
-        echom "Please update config file[" . l:local_conf . "] found."
         call setbufvar('%', 'config_loaded', 0)
+        throw "Please update config file[" . l:local_conf . "] found."
     endif
 endf
 " [End]load external config file
@@ -155,8 +155,31 @@ func! ModifyTag#mapping() abort
     command! -n=+ -bar ModifyTagDiff2Html :call s:Diff2Html(<f-args>)
     command! -n=0 -bar ModifyTagSumFiles :call s:SumModifiedFiles()
     command! -n=0 -bar ModifyTagDiffFiles :call s:MakeVimScript()
-    " TODO: edit file with unrecognized encoding
-    " ModifyTagUpdateLinesBatch, ModifyTagStaticCheck, ModifyTagListStaticCheck, ModifyTagFilterStaticCheck
+    call s:mapping_key()
+endf
+func! s:mapping_key() abort
+    let g:_spacevim_mappings.T = {'name' : '+ModifyTag'}
+    call SpaceVim#mapping#def('nmap', '<Leader>Ta', ':ModifyTagAddSource<CR>', 'add code', '', 'add code')
+    call SpaceVim#mapping#def('vmap', '<Leader>Ta', ':ModifyTagAddSource<CR>', 'add code', '', 'add code')
+    call SpaceVim#mapping#def('vmap', '<Leader>Tc', ':ModifyTagChgSource<CR>', 'change code', '', 'change code')
+    call SpaceVim#mapping#def('vmap', '<Leader>Td', ':ModifyTagDelSource<CR>', 'delete code', '', 'delete code')
+    call SpaceVim#mapping#def('nmap', '<Leader>Tu', ':ModifyTagUpdateLines<CR>', 'update lines info', '', 'update lines info')
+    call SpaceVim#mapping#def('vmap', '<Leader>Tm', ':ModifyTagManualCount<CR>', 'count lines info', '', 'count lines info')
+    call SpaceVim#mapping#def('nmap', '<Leader>Ts', ':ModifyTagSumLines<CR>', 'summary lines info', '', 'summary lines info')
+    call SpaceVim#mapping#def('nmap', '<Leader>Tt', ':ModifyTagTerminalCmd<CR>', 'search modification list', '', 'search modification list')
+    call SpaceVim#mapping#def('nmap', '<Leader>To', ':ModifyTagOKChanges<CR>', 'approve changes', '', 'approve changes')
+    call SpaceVim#mapping#def('vmap', '<Leader>To', ':ModifyTagOKChanges<CR>', 'approve changes', '', 'approve changes')
+    call SpaceVim#mapping#def('vmap', '<Leader>TO', ':ModifyTagOKWithoutTag<CR>', 'approve changes with tag reformatting', '', 'approve changes with tag reformatting')
+    call SpaceVim#mapping#def('nmap', '<Leader>Tn', ':ModifyTagNGChanges<CR>', 'deny changes', '', 'deny changes')
+    call SpaceVim#mapping#def('vmap', '<Leader>Tn', ':ModifyTagNGChanges<CR>', 'deny changes', '', 'deny changes')
+    call SpaceVim#mapping#def('nmap', '<Leader>Tb', ':ModifyTagUpdateLinesBatch<CR>', 'batch update lines info', '', 'batch update lines info')
+    call SpaceVim#mapping#def('nmap', '<Leader>Tl', ':ModifyTagStaticCheck 0 1<CR>', 'loop check', '', 'loop check')
+    call SpaceVim#mapping#def('nmap', '<Leader>Tz', ':ModifyTagStaticCheck 0 0<CR>', 'divide check', '', 'divide check')
+    call SpaceVim#mapping#def('nmap', '<Leader>TL', ':ModifyTagStaticCheck 1 1<CR>', 'batch loop check', '', 'batch loop check')
+    call SpaceVim#mapping#def('nmap', '<Leader>TZ', ':ModifyTagStaticCheck 1 0<CR>', 'batch divide check', '', 'batch divide check')
+    call SpaceVim#mapping#def('nmap', '<Leader>Tf', ':ModifyTagFilterStaticCheck<CR>', 'filter static checks', '', 'filter static checks')
+    call SpaceVim#mapping#def('nmap', '<Leader>TS', ':ModifyTagSumFiles<CR>', 'summary files info', '', 'summary files info')
+    call SpaceVim#mapping#def('nmap', '<Leader>TD', ':ModifyTagDiffFiles<CR>', 'diff files', '', 'diff files')
 endf
 
 let s:ptn_escape = '/*[]()'
@@ -296,6 +319,7 @@ func! s:CalculateModifiedLinesBatch()
 endf
 func! s:CalculateModifiedLinesAndClose()
     call s:loadConfig()
+    silent! exe "FencAutoDetect"
     call s:CalculateModifiedLines()
     silent! exe "write"
     call s:closebuffer()
@@ -1146,6 +1170,7 @@ func! s:findStaticCheck(type)
     return l:lines
 endf
 func! s:ListStaticCheck(loopcheck, outnr)
+    silent! exe "FencAutoDetect"
     let l:curfile = expand("%:p")
     if a:loopcheck == 1
         let l:linenos = s:findStaticCheck(1)
@@ -1208,6 +1233,6 @@ func! s:rootpath()
     return SpaceVim#plugins#projectmanager#current_root()
 endf
 func! s:closebuffer()
-    " silent! exe "bdelete"
-    call SpaceVim#mapping#close_current_buffer()
+    silent! exe "bdelete"
+    " call SpaceVim#mapping#close_current_buffer()
 endf
