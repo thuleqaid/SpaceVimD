@@ -4,7 +4,7 @@ let g:et#openwith = {'png': 'E:\PortableSoft\iview\i_view64.exe'
                   \ }
 let s:extlist_autofenc = ['c', 'h']
 let s:extlist_disablecomplete = ['rs']
-let s:extlist_expandtab = ['python', 'html', 'rust', 'javascript', 'markdown', 'vim', 'c', 'cpp']
+let s:extlist_expandtab = ['python', 'html', 'rust', 'javascript', 'vue', 'markdown', 'vim', 'c', 'cpp']
 
 silent! exe 'source ' . expand("<sfile>:p:h") . '/common.vim'
 silent! exe 'source ' . expand("<sfile>:p:h") . '/et.vim'
@@ -94,7 +94,7 @@ endf
 
 function! g:BMWorkDirFileLocation()
     let filename = '/.bookmarks'
-    return SpaceVim#plugins#projectmanager#current_root() . filename
+    return RootPath() . filename
 endfunction
 
 func! myspacevim#after() abort
@@ -191,6 +191,8 @@ func! myspacevim#after() abort
     nmap <C-F7> :call et#Execute(1, 1)<CR>
     nmap <F8> :call et#OpenWith()<CR>
     nmap <F9> :call ip#moveToOtherProcess()<CR>
+    nmap <F10> :call InputRelPath()<CR>
+    map! <F10> <C-o>:call InputRelPath()<CR>
 
     command! -bang -nargs=0 AsyncAuto call s:AsyncTaskAuto()
     command! -n=0 -bar EnableModifyTag :call s:enableModifyTag()

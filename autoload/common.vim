@@ -30,6 +30,59 @@ func! LvlDraw() range
         let l:i = l:i + 1
     endwhile
 endf
+func! RootPath(...) abort
+    let l:rootpattern = [".git", ".svn", ".hg", ".root"]
+    if a:0 > 0
+        let l:rootpattern = l:rootpattern + a:1
+    endif
+    let l:curpath = expand("%:p:h")
+    while 1
+        for l:item in readdir(l:curpath)
+            if index(l:rootpattern, l:item) >= 0
+                if has('win32unix')
+                  " convert cygwin path to windows path
+                  let l:curpath = substitute(system('cygpath -wa ' . l:curpath), "\n$", '', '')
+                  let l:curpath = substitute(l:curpath, '\', '/', 'g')
+                elseif has('win32')
+                  let l:curpath = substitute(l:curpath, '\', '/', 'g')
+                endif
+                return l:curpath
+            endif
+        endfor
+        let l:newpath = fnamemodify(l:curpath, ":h")
+        if l:newpath == l:curpath
+            return ""
+        else
+            let l:curpath = l:newpath
+        endif
+    endwhile
+endf
+func! InputRelPath() abort
+    let l:col = col(".") - 1
+    let l:line = getline(".")
+    let l:fname1 = expand("%:p:h")
+    let l:fname2 = input("File: ", l:fname1, "file")
+    let l:parts1 = split(substitute(l:fname1, '\', '/', 'g'), '/')
+    let l:parts2 = split(substitute(l:fname2, '\', '/', 'g'), '/')
+    if len(l:parts2) > 0
+        if l:parts1[0] == l:parts2[0]
+            let l:idx = 0
+            while (l:idx < len(l:parts1)) && (l:idx < len(l:parts2))
+                if l:parts1[l:idx] == l:parts2[l:idx]
+                    let l:idx = l:idx + 1
+                else
+                    let l:fname2 = trim(repeat("../", len(l:parts1) - l:idx), "/")
+                    while l:idx < len(l:parts2)
+                        let l:fname2 = l:fname2 . "/" . l:parts2[l:idx]
+                        let l:idx = l:idx + 1
+                    endwhile
+                endif
+            endwhile
+        endif
+        let l:line = strpart(l:line, 0, l:col) . l:fname2 . strpart(l:line, l:col)
+        call setline(".", l:line)
+    endif
+endf
 " Inner functions
 " Part 1
 func! s:get_choice() abort

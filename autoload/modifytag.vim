@@ -101,10 +101,10 @@ let s:template = [
             \ "tag4 = '#4 FileList:'",
             \ "tag5 = '#5 Finished'" ]
 func! s:loadConfig() abort
-    let l:local_conf = SpaceVim#plugins#projectmanager#current_root() . s:config_file
+    let l:local_conf = s:rootpath() . s:config_file
     if filereadable(l:local_conf)
         " config file exists
-        let l:local_cache = SpaceVim#plugins#projectmanager#current_root() . s:config_cache
+        let l:local_cache = s:rootpath() . s:config_cache
         if filereadable(l:local_cache)
             " cache file exists
             if getftime(l:local_conf) < getftime(l:local_cache)
@@ -1230,7 +1230,7 @@ func! s:createPath(filename)
     endif
 endf
 func! s:rootpath()
-    return SpaceVim#plugins#projectmanager#current_root()
+    return RootPath()
 endf
 func! s:closebuffer()
     silent! exe "bdelete"
