@@ -30,7 +30,7 @@
     filemanager = "nerdtree"
     guifont = "SauceCodePro Nerd Font Mono:h11,MS_Gothic:h11:cSHIFTJIS,SimSun-ExtB:h11:cGB2312:qDRAFT"
     bootstrap_after = "myspacevim#after"
-    disabled_plugins = ['tagbar-markdown', 'mathjax-support-for-mkdp', 'markdown-preview.nvim', 'vim-node-rpc']
+    disabled_plugins = ['tagbar-markdown', 'mathjax-support-for-mkdp', 'markdown-preview.nvim', 'vim-node-rpc', 'vimloo', 'vnote']
 
 # Enable autocomplete layer
 [[layers]]
@@ -70,6 +70,9 @@ name = "tools"
 
 [[layers]]
 name = "chinese"
+
+[[layers]]
+name = "git"
 
 [[custom_plugins]]
 name = "vim-scripts/VisIncr"
