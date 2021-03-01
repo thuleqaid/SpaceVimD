@@ -119,6 +119,9 @@ func! myspacevim#after() abort
     augroup HookPost
     autocmd BufReadPost * call s:HookPost()
     augroup END
+    augroup MarkdownEmoji
+    autocmd FileType markdown setlocal completefunc=emoji#complete
+    augroup END
     " rust
     let g:racer_cmd = exepath('racer')
     " define 'SPC j p' to jump to next placeholder of neosnippet
