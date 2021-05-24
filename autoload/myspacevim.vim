@@ -44,6 +44,31 @@ func! s:autoExpandTab()
         silent! exe "setlocal expandtab"
     endif
 endf
+func! s:autoChdir()
+    let l:cfile = expand("%:p")
+    if l:cfile == ""
+    else
+        let l:childflag = 0
+        let l:cwd = getcwd()
+        let l:lcwd = fnamemodify(l:cfile, ":h")
+        if stridx(l:lcwd, l:cwd) == 0
+            while strlen(l:lcwd) > strlen(l:cwd)
+                let l:lcwd = fnamemodify(l:lcwd, ":h")
+            endwhile
+            if l:lcwd == l:cwd
+                let l:childflag = 1
+            endif
+        endif
+        if l:childflag == 0
+            let l:root = RootPath()
+            if l:root == ""
+                call chdir(fnamemodify(l:cfile, ":h"))
+            else
+                call chdir(l:root)
+            endif
+        endif
+    endif
+endf
 
 func! s:AsyncTaskAuto() abort
     let l:tasks = asynctasks#list('')
@@ -118,6 +143,9 @@ func! myspacevim#after() abort
     augroup END
     augroup HookPost
     autocmd BufReadPost * call s:HookPost()
+    augroup END
+    augroup BufferSwitched
+    autocmd BufEnter * call s:autoChdir()
     augroup END
     augroup MarkdownEmoji
     autocmd FileType markdown setlocal completefunc=emoji#complete
