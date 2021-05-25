@@ -67,6 +67,29 @@ func! s:autoChdir()
                 call chdir(l:root)
             endif
         endif
+        if exists('b:_lvimrc_loaded') && b:_lvimrc_loaded != 0
+        else
+            let l:rootlen = strlen(getcwd())
+            let l:localrc = '.lvimrc.vim'
+            " find local vimrc list
+            let l:lvimrc = []
+            let l:lcwd = fnamemodify(l:cfile, ":h")
+            while strlen(l:lcwd) >= l:rootlen
+                let l:target = findfile(l:localrc, l:lcwd)
+                if l:target == ''
+                else
+                    let l:lvimrc = insert(l:lvimrc, l:target)
+                endif
+                let l:lcwd = fnamemodify(l:lcwd, ":h")
+            endwhile
+            " source local vimrc files
+            let l:i = 0
+            while l:i < len(l:lvimrc)
+                silent! exe 'source ' . l:lvimrc[l:i]
+                let l:i = l:i + 1
+            endwhile
+            let b:_lvimrc_loaded = 1
+        endif
     endif
 endf
 
