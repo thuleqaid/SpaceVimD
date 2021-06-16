@@ -86,17 +86,28 @@ options     head
 	
 	..
 	  #+begin_src python :cache yes :file $1
+	  import matplotlib.font_manager as fm
+	  import matplotlib.patches as patches
 	  import matplotlib.pyplot as plt
 	  fs = (4, 3)
 	  dpi_set = 100
-	  plt.figure(figsize=fs, dpi=dpi_set)
-	  plt.axis([0, dpi_set * fs[0] - 1, 0, dpi_set * fs[1] - 1])
-	  plt.subplots_adjust(left=0, top=1, right=1, bottom=0, wspace=0, hspace=0)
-	  ax = plt.gca()
+	  fontfile = r'c:\Windows\Fonts\simsun.ttc'
+	  fontinfo = {'fontproperties': fm.FontProperties(fname=fontfile),
+	              'fontsize': 15,
+	              'ha': 'center',
+	              'va': 'center'}
+	  fig = plt.figure(figsize=fs, dpi=dpi_set)
+	  ax = fig.add_axes((0., 0., 1., 1.))
+	  ax.set(xlim=(0, dpi_set * fs[0] - 1), ylim=(0, dpi_set * fs[1] - 1))
+	  # ax.grid()
+	  ax.set_axis_off()
+	  fig.subplots_adjust(left=0, top=1, right=1, bottom=0, wspace=0, hspace=0)
 	  ax.spines['top'].set_visible(False)
 	  ax.spines['right'].set_visible(False)
 	  ax.spines['bottom'].set_visible(False)
 	  ax.spines['left'].set_visible(False)
+	  # ax.add_patch(patches.Rectangle((2, 2), 200, 100))
+	  # ax.annotate("Text", (0, 0), xytext=(200, 200), arrowprops={'arrowstyle': '->'}, **fontinfo)
 	  ${0}
-	  plt.savefig('$1')
+	  fig.savefig('$1')
 	  #+end_src
