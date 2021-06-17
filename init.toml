@@ -30,6 +30,7 @@
     filemanager = "nerdtree"
     enable_vimfiler_welcome = 0
     guifont = "SauceCodePro Nerd Font Mono:h11,MS_Gothic:h11:cSHIFTJIS,SimSun-ExtB:h11:cGB2312:qDRAFT"
+    autocomplete_method = 'deoplete'
     bootstrap_after = "myspacevim#after"
     disabled_plugins = ['tagbar-markdown', 'mathjax-support-for-mkdp', 'markdown-preview.nvim', 'vim-node-rpc', 'vimloo', 'vnote']
 
