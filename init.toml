@@ -57,6 +57,7 @@ name = "lang#rust"
 [[layers]]
 name = "lang#python"
 format-on-save = 1
+enabled_linters = ['python', 'flake8', 'pylint']
 
 [[layers]]
 name = "lang#vue"
