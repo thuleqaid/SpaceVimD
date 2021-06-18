@@ -16,11 +16,11 @@ func! s:HookPreload() abort
     let l:filename = expand("<afile>")
     let l:filesize=getfsize(l:filename)
     if l:filesize>l:SizeLimit100k || l:filesize==-2
-        call neocomplete#commands#_lock()
+        call deoplete#custom#buffer_option('auto_complete', v:false)
     endif
     let l:fileext = tolower(fnamemodify(l:filename, ":t:e"))
     if index(s:extlist_disablecomplete, l:fileext) >= 0
-        call neocomplete#commands#_lock()
+        call deoplete#custom#buffer_option('auto_complete', v:false)
     endif
 endf
 func! s:HookPost() abort
