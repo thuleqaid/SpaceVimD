@@ -67,28 +67,114 @@ func! s:autoChdir()
                 call chdir(l:root)
             endif
         endif
-        if exists('b:_lvimrc_loaded') && b:_lvimrc_loaded != 0
+        if exists('b:_lvimrc_list') && exists('b:_lvimrc_status')
+            let l:i = 0
+            while l:i < len(b:_lvimrc_list)
+                if and(b:_lvimrc_status[l:i], 0x02) > 0
+                    silent! exe 'source ' . b:_lvimrc_list[l:i]
+                    call _lvimrc_func_(1)
+                endif
+                let l:i = l:i + 1
+            endwhile
         else
             let l:rootlen = strlen(getcwd())
             let l:localrc = '.lvimrc.vim'
             " find local vimrc list
-            let l:lvimrc = []
+            let b:_lvimrc_list = []
+            let b:_lvimrc_status = []
             let l:lcwd = fnamemodify(l:cfile, ":h")
             while strlen(l:lcwd) >= l:rootlen
                 let l:target = findfile(l:localrc, l:lcwd)
                 if l:target == ''
                 else
-                    let l:lvimrc = insert(l:lvimrc, l:target)
+                    let b:_lvimrc_list = insert(b:_lvimrc_list, l:target)
                 endif
                 let l:lcwd = fnamemodify(l:lcwd, ":h")
             endwhile
             " source local vimrc files
             let l:i = 0
-            while l:i < len(l:lvimrc)
-                silent! exe 'source ' . l:lvimrc[l:i]
+            while l:i < len(b:_lvimrc_list)
+                silent! exe 'source ' . b:_lvimrc_list[l:i]
+                if exists(_lvimrc_func_)
+                    let b:_lvimrc_status = insert(b:_lvimrc_status, _lvimrc_func_(0))
+                else
+                    let b:_lvimrc_status = insert(b:_lvimrc_status, 0)
+                endif
                 let l:i = l:i + 1
             endwhile
-            let b:_lvimrc_loaded = 1
+        endif
+    endif
+endf
+func! s:autoChdir_end()
+    if exists('b:_lvimrc_list') && exists('b:_lvimrc_status')
+        let l:i = len(b:_lvimrc_list) - 1
+        while l:i >= 0
+            if and(b:_lvimrc_status[l:i], 0x01) > 0
+                silent! exe 'source ' . b:_lvimrc_list[l:i]
+                call _lvimrc_func_(-1)
+            endif
+            let l:i = l:i - 1
+        endwhile
+    endif
+endf
+
+func! TmplLocalScript()
+    let l:dir = input("Target Dir: ", getcwd(), "dir")
+    if l:dir == ''
+        echom "No dir specified, skipped!"
+    else
+        let l:localrc = '.lvimrc.vim'
+        let l:target = findfile(l:localrc, l:dir)
+        if l:target == ''
+            let l:target = fnamemodify(l:dir, ":p") . l:localrc
+            let l:text = [
+\ 'func! _lvimrc_func_(step)',
+\ '  let l:reload = 0',
+\ '  let l:unload = 0',
+\ '  if a:step >= 0',
+\ '    "" load step',
+\ '    if a:step == 0',
+\ '      "" first load',
+\ '      "" Set file encoding for rg',
+\ '      " let b:search_tools = {}',
+\ '      " let b:search_tools.rg = ["-E", "sjis"]',
+\ '      "" Make file readonly',
+\ '      " if index(["c", "h"], tolower(expand("%:t:e"))) >= 0',
+\ '      "   set readonly',
+\ '      " endif',
+\ '    else',
+\ '      "" reload',
+\ '    endif',
+\ '  else',
+\ '    "" unload step',
+\ '  endif',
+\ '  return l:reload * 2 + l:unload',
+\ 'endf'
+\ ]
+            call writefile(l:text, l:target, "b")
+        else
+            echom l:target . " existed, skipped!"
+        endif
+    endif
+endf
+func! TmplAsyncTask()
+    let l:dir = input("Target Dir: ", getcwd(), "dir")
+    if l:dir == ''
+        echom "No dir specified, skipped!"
+    else
+        let l:localrc = '.tasks'
+        let l:target = findfile(l:localrc, l:dir)
+        if l:target == ''
+            let l:target = fnamemodify(l:dir, ":p") . l:localrc
+            let l:text = [
+\ '[run]',
+\ 'command=python "$(VIM_FILENAME)"',
+\ 'cwd=$(VIM_FILEDIR)',
+\ 'output=terminal'
+\ ]
+            call writefile(l:text, l:target, "b")
+        else
+            echom l:target . " existed, skipped!"
         endif
     endif
 endf
@@ -169,6 +255,7 @@ func! myspacevim#after() abort
     augroup END
     augroup BufferSwitched
     autocmd BufEnter * call s:autoChdir()
+    autocmd BufLeave * call s:autoChdir_end()
     augroup END
     augroup MarkdownEmoji
     autocmd FileType markdown setlocal completefunc=emoji#complete
