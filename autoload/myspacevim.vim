@@ -73,6 +73,7 @@ func! s:autoChdir()
                 if and(b:_lvimrc_status[l:i], 0x02) > 0
                     silent! exe 'source ' . b:_lvimrc_list[l:i]
                     call _lvimrc_func_(1)
+                    silent! exe 'delfunction _lvimrc_func_'
                 endif
                 let l:i = l:i + 1
             endwhile
@@ -95,11 +96,13 @@ func! s:autoChdir()
             let l:i = 0
             while l:i < len(b:_lvimrc_list)
                 silent! exe 'source ' . b:_lvimrc_list[l:i]
-                if exists(_lvimrc_func_)
+                try
+                    call funcref('_lvimrc_func_')
                     let b:_lvimrc_status = insert(b:_lvimrc_status, _lvimrc_func_(0))
-                else
+                    silent! exe 'delfunction _lvimrc_func_'
+                catch /E700:/
                     let b:_lvimrc_status = insert(b:_lvimrc_status, 0)
-                endif
+                endtry
                 let l:i = l:i + 1
             endwhile
         endif
@@ -112,6 +115,7 @@ func! s:autoChdir_end()
             if and(b:_lvimrc_status[l:i], 0x01) > 0
                 silent! exe 'source ' . b:_lvimrc_list[l:i]
                 call _lvimrc_func_(-1)
+                silent! exe 'delfunction _lvimrc_func_'
             endif
             let l:i = l:i - 1
         endwhile
