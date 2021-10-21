@@ -341,5 +341,6 @@ func! myspacevim#after() abort
 
     command! -bang -nargs=0 AsyncAuto call s:AsyncTaskAuto()
     command! -n=0 -bar EnableModifyTag :call s:enableModifyTag()
-    command! -n=0 -rang=% -bar LvlDraw :<line1>,<line2>call LvlDraw()
+    command! -n=0 -rang=% -bar LvlDraw :<line1>,<line2>call LvlDraw(1)
+    command! -n=0 -rang=% -bar LvlDrawTab :<line1>,<line2>call LvlDraw(2)
 endf

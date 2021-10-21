@@ -16,16 +16,19 @@ func! SelectTable(table, highmap, markindex) abort
         return l:choice
     endif
 endf
-func! LvlDraw() range
-    let l:levels = s:calcLevels(a:firstline, a:lastline)
-    let l:indent = len(s:indent)
+func! LvlDraw(type) range
+    let l:suffix = ''
+    if a:type == 2
+        let l:suffix = '	'
+    endif
+    let l:levels = s:calcLevels(a:firstline, a:lastline, l:suffix)
     let l:i      = a:firstline
     while l:i <= a:lastline
         if l:levels[l:i - a:firstline][0] < 0
             " empty line
             call setline(l:i, l:levels[l:i - a:firstline][1])
         else
-            call setline(l:i, l:levels[l:i - a:firstline][1] . strpart(getline(l:i), l:indent * l:levels[l:i - a:firstline][0]))
+            call setline(l:i, l:levels[l:i - a:firstline][1] . substitute(getline(l:i), '^' . s:indent . '\+', '', ''))
         endif
         let l:i = l:i + 1
     endwhile
@@ -190,8 +193,8 @@ else
     let s:mark2  = iconv("\xe2\x94\x83", "utf-8", &enc) . '  '
     let s:mark3  = iconv("\xe2\x94\x97\xe2\x94\x81", "utf-8", &enc)
 endif
-let s:indent = '    '
-func! s:calcLevels(linestart, linestop)
+let s:indent = '\(    \|\t\)'
+func! s:calcLevels(linestart, linestop, suffix)
     let l:result = []
     let l:i      = a:linestart
     while l:i <= a:linestop
@@ -216,13 +219,13 @@ func! s:calcLevels(linestart, linestop)
         let l:prefix = ''
         for l:element in l:tmp
             if l:element == 0
-                let l:prefix = l:prefix . s:mark0
+                let l:prefix = l:prefix . s:mark0 . a:suffix
             elseif l:element == 1
-                let l:prefix = l:prefix . s:mark1
+                let l:prefix = l:prefix . s:mark1 . a:suffix
             elseif l:element == 2
-                let l:prefix = l:prefix . s:mark2
+                let l:prefix = l:prefix . s:mark2 . a:suffix
             elseif l:element == 3
-                let l:prefix = l:prefix . s:mark3
+                let l:prefix = l:prefix . s:mark3 . a:suffix
             endif
         endfor
         call add(l:result2, [l:val, l:prefix])
