@@ -1,4 +1,5 @@
 let g:et#bin_plantuml = 'E:\home\.SpaceVim.d\plantuml.jar'
+let g:et#bin_java = 'E:\PortableSoft\jdk-11.0.11+9\bin\java.exe'
 let g:et#openwith = {'png': 'E:\PortableSoft\iview\i_view64.exe'
                   \ ,'jpg': 'E:\PortableSoft\iview\i_view64.exe'
                   \ }

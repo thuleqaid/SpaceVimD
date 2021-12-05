@@ -39,7 +39,11 @@ func! s:plantuml_run(info) abort
 	silent! exe 'cd %:h'
 	let l:result = system(l:cmd)
 	" rename outfile
-	call rename(strpart(a:info['#tmpname'], 0, strridx(a:info['#tmpname'], '.')) . strpart(a:info[':file'][0], strridx(a:info[':file'][0], '.')), fnamemodify(a:info[':file'][0], ":p"))
+	if strridx(a:info['#tmpname'], '.') > 0
+		call rename(strpart(a:info['#tmpname'], 0, strridx(a:info['#tmpname'], '.')) . strpart(a:info[':file'][0], strridx(a:info[':file'][0], '.')), fnamemodify(a:info[':file'][0], ":p"))
+	else
+		call rename(a:info['#tmpname'] . strpart(a:info[':file'][0], strridx(a:info[':file'][0], '.')), fnamemodify(a:info[':file'][0], ":p"))
+	endif
 	silent! exe 'cd -'
 	return l:result
 endf
