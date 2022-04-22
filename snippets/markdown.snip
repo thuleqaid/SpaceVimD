@@ -4,7 +4,7 @@ options     head
 	![${2:`sha256(strftime('%F %T').'#'.expand('%:p'))`}](${1:#:filename})
 	
 	<!--
-	  #+begin_src dot :cache yes :file $1 :hash $2
+	  #+begin_src dot :cache yes :escape html_close_cmt :file $1 :hash $2
 	  digraph G {
 	  	node [fontname="Microsoft YaHei"];
 	  	edge [fontname="MS PGothic"];
@@ -28,7 +28,7 @@ options     head
 	![${2:`sha256(strftime('%F %T').'#'.expand('%:p'))`}](${1:#:filename})
 	
 	<!--
-	  #+begin_src plantuml :cache yes :file $1 :cmdline -charset UTF-8 :hash $2
+	  #+begin_src plantuml :cache yes :escape html_close_cmt :file $1 :cmdline -charset UTF-8 :hash $2
 	  @startuml
 	  ${0}
 	  @enduml
@@ -41,7 +41,7 @@ options     head
 	![${2:`sha256(strftime('%F %T').'#'.expand('%:p'))`}](${1:#:filename})
 	
 	<!--
-	  #+begin_src python :cache yes :file $1 :hash $2
+	  #+begin_src python :cache yes :escape html_close_cmt :file $1 :hash $2
 	  import matplotlib.font_manager as fm
 	  import matplotlib.patches as patches
 	  import matplotlib.pyplot as plt

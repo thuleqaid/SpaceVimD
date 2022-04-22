@@ -33,22 +33,15 @@ func! et#Execute(whole, force) abort
 			let l:pos = l:posinfo[l:posidx]
 			redraw
 			echo 'Executing ' . (l:poslen - l:posidx) . '/' . l:poslen . ' at lines between ' . l:pos[0] . ' and ' . l:pos[1]
-			let l:lines = getline(l:pos[0], l:pos[1])
-			" get script lines
-			let l:i = 1
-			let l:scripts = []
-			let l:prefix = strpart(l:lines[0], 0, l:pos[2])
-			while l:i < len(l:lines) - 1
-				call add(l:scripts, strpart(l:lines[l:i], l:pos[2]))
-				let l:i = l:i + 1
-			endwhile
-			let l:md5 = sha256(join(l:scripts, "\n"))
+
 			" parse params
-			let l:startline = strpart(l:lines[0], l:pos[2])
+			let l:firstline = getline(l:pos[0])
+			let l:startline = strpart(l:firstline, l:pos[2])
+			let l:prefix = strpart(l:firstline, 0, l:pos[2])
 			let l:params = split(l:startline, ' \+')
 			call remove(l:params, 0)
 			let l:tmpfile = tempname()
-			let l:info = {'#language': l:params[0], '#tmpname': l:tmpfile, '#md5': l:md5, '#cache': -1, '#pos': l:pos, '#scripts': l:scripts, '#prefix': l:prefix}
+			let l:info = {'#language': l:params[0], '#tmpname': l:tmpfile, '#cache': -1, '#pos': l:pos, '#prefix': l:prefix}
 			let l:lastkey = ''
 			let l:i = 1
 			while l:i < len(l:params)
@@ -68,37 +61,61 @@ func! et#Execute(whole, force) abort
 				echo l:info['#language'] . ' is not supported.'
 				let l:run = 0
 			endif
-			" check cache
-			if has_key(l:info, ':cache') && (l:run > 0)
-				if (len(l:info[':cache']) > 0) && (l:info[':cache'][0] =~ '^\cyes$')
-					" check last md5
-					let l:i = l:pos[1] + 1
-					let l:linecheck = getline(l:i)
-					let l:checkpat = '^\(' . escape(l:prefix, '/*[]()') . '\)\? *$'
-					let l:checkpat2 = '^\(' . escape(l:prefix, '/*[]()') . '\)\?#+RESULTS\[[a-z0-9]\+\]'
-					let l:maxi = line('$')
-					while (l:i < l:maxi) && (l:linecheck =~ l:checkpat)
-						" empty line, check next line
-						let l:i = l:i + 1
+
+			if l:run > 0
+				let l:lines = getline(l:pos[0]+1, l:pos[1])
+				" get script lines
+				let l:i = 0
+				let l:scripts = []
+				let l:escape = 0
+				if has_key(l:info, ':escape') && (index(l:info[':escape'], 'html_close_cmt') >= 0)
+					let l:escape = 1
+				endif
+				while l:i < len(l:lines) - 1
+					if l:escape > 0
+						if stridx(l:lines[l:i], '-->') >= 0
+							let l:lines[l:i] = substitute(l:lines[l:i], '-->', '--\&gt;', 'g')
+							call setline(l:pos[0] + 1 + l:i, l:lines[l:i])
+						endif
+						call add(l:scripts, substitute(strpart(l:lines[l:i], l:pos[2]), '--&gt;', '-->', 'g'))
+					else
+						call add(l:scripts, strpart(l:lines[l:i], l:pos[2]))
+					endif
+					let l:i = l:i + 1
+				endwhile
+				let l:md5 = sha256(join(l:scripts, "\n"))
+				let l:info['#md5'] = l:md5
+				let l:info['#scripts'] = l:scripts
+				" check cache
+				if has_key(l:info, ':cache')
+					if (len(l:info[':cache']) > 0) && (l:info[':cache'][0] =~ '^\cyes$')
+						" check last md5
+						let l:i = l:pos[1] + 1
 						let l:linecheck = getline(l:i)
-					endwhile
-					if l:linecheck =~ l:checkpat2
-						let l:aa = matchstrpos(l:linecheck, '\[[0-9a-z]\+\]')
-						if strpart(l:aa[0], 1, len(l:aa[0]) - 2) == l:info['#md5']
-							if a:force > 0
-								let l:info['#cache'] = l:i
+						let l:checkpat = '^\(' . escape(l:prefix, '/*[]()') . '\)\? *$'
+						let l:checkpat2 = '^\(' . escape(l:prefix, '/*[]()') . '\)\?#+RESULTS\[[a-z0-9]\+\]'
+						let l:maxi = line('$')
+						while (l:i < l:maxi) && (l:linecheck =~ l:checkpat)
+							" empty line, check next line
+							let l:i = l:i + 1
+							let l:linecheck = getline(l:i)
+						endwhile
+						if l:linecheck =~ l:checkpat2
+							let l:aa = matchstrpos(l:linecheck, '\[[0-9a-z]\+\]')
+							if strpart(l:aa[0], 1, len(l:aa[0]) - 2) == l:info['#md5']
+								if a:force > 0
+									let l:info['#cache'] = l:i
+								else
+									let l:run = -1
+								endif
 							else
-								let l:run = -1
+								let l:info['#cache'] = l:i
 							endif
 						else
-							let l:info['#cache'] = l:i
+							let l:info['#cache'] = 0
 						endif
-					else
-						let l:info['#cache'] = 0
 					endif
 				endif
-			endif
-			if l:run > 0
 				let l:languages = get(g:, 'et#languages', {})
 				" create dir if necessary
 				if has_key(l:info, ':file') && (len(l:info[':file']) > 0)
