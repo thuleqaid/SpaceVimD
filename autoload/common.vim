@@ -40,7 +40,7 @@ func! RootPath(...) abort
     endif
     let l:curpath = expand("%:p:h")
     while 1
-        for l:item in readdir(l:curpath)
+        for l:item in glob(l:curpath . '/*', 0, 1)
             if index(l:rootpattern, l:item) >= 0
                 if has('win32unix')
                   " convert cygwin path to windows path
